@@ -122,7 +122,7 @@ docker logs -f frigate
 
 > `成功发送 Bark 通知: Frigate 监控警报 - 摄像头 [front_door] 检测到 [person]。`
 
-```
+
 ---
 
 使用 **Cloudflare Tunnels（内网穿透）** 是目前业界公认最优雅、最安全的无公网 IP 远程访问方案。它不需要在路由器上开放任何端口，自带 HTTPS 加密，而且完全隐藏了你家里的真实公网 IP。
