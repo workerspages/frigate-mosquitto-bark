@@ -1,0 +1,75 @@
+name: Build and Push Docker Image
+
+# 触发条件：当向 main 分支推送代码，或者推送以 v 开头的内容标签（如 v1.0.0）时触发
+on:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "v*"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # 必须赋予写入包的权限，以便推送到 ghcr.io
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 设置 QEMU 模拟器（用于支持多架构编译，例如 arm64）
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # 3. 设置 Docker Buildx 构建器
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 4. 登录到 Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 5. 登录到 GitHub Container Registry (ghcr.io)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. 提取和生成镜像的标签和元数据
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # 同时定义 Docker Hub 和 GHCR 的镜像全名
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/frigate-bark
+            ghcr.io/${{ github.repository }}
+          # 标签规则：如果是 main 分支则标记为 latest，如果是 tag 推送则标记为版本号
+          tags: |
+            type=edge,branch=main
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      # 7. 同时构建并推送多架构镜像
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # 同时编译 AMD64 (普通电脑/服务器) 和 ARM64 (树莓派/部分软路由) 架构
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # 利用 GitHub 缓存层加速后续的构建速度
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
