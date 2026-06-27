@@ -124,9 +124,9 @@ docker logs -f frigate
 
 
 ---
+## 📝 Cloudflare Tunnels（内网穿透）
 
 使用 **Cloudflare Tunnels（内网穿透）** 是目前业界公认最优雅、最安全的无公网 IP 远程访问方案。它不需要在路由器上开放任何端口，自带 HTTPS 加密，而且完全隐藏了你家里的真实公网 IP。
-
 既然你已经有了这个强大的基础设施，我们就可以非常清晰地规划你的配置了。
 
 不过，在使用 Cloudflare Tunnels 配合 Bark 时，我们会遇到一个经典的“安全与便利的博弈”。以下是为你梳理的利弊和最佳实践：
