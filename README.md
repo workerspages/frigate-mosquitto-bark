@@ -41,8 +41,7 @@ version: '3.9'
 
 services:
   frigate:
-    # 你可以替换为 ghcr.io/<YOUR_GITHUB_USERNAME>/frigate-bark:latest
-    image: <YOUR_DOCKERHUB_USERNAME>/frigate-bark:latest
+    image: ghcr.io/workerspages/frigate-mosquitto-bark:latest
     container_name: frigate
     privileged: true
     restart: unless-stopped
