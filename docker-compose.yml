@@ -21,9 +21,9 @@ services:
       - "8555:8555/udp"   # WebRTC 视频流端口 (可选)
       - "5000:5000"       # 暴露 5000 这个“免密验证”端口，让 Bark App 能顺利把图片拉取下来
     environment:
-      - TZ: "Asia/Shanghai" # 设置为中国+8时区
-      # 【必填】你的专属 Bark 推送地址和 Key
-      - BARK_URL: https://api.day.app/YOUR_BARK_KEY
-      # 【可选】填入你机器的局域网或公网 IP 地址，让推送能带上抓拍图片
-      - FRIGATE_URL: http://192.168.1.100:5000
+      - TZ="Asia/Shanghai"                             # 设置为中国+8时区
+      
+      - BARK_URL="https://api.day.app/YOUR_BARK_KEY"   # 【必填】你的专属 Bark 推送地址和 Key 
+      - FRIGATE_URL="http://192.168.31.100:5000"       # 【可选】填入你机器的局域网或公网 IP 地址，让推送能带上抓拍图片
+      
     # FRIGATE_RTSP_PASSWORD: "password"     # rtsp的密码，请修改为你期望的密码
