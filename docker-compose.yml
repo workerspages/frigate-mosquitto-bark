@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  frigate:
+    # 注意这里改为了 build: . 
+    # 意为根据当前目录的 Dockerfile 现场构建集成了 Mosquitto 的专属镜像
+    build: .
+    container_name: frigate
+    privileged: true
+    restart: unless-stopped
+    shm_size: "64mb"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      # 映射你的配置文件和存储路径
+      - ./config:/config
+      - ./storage:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971"
+      - "5000:5000"
+    environment:
+      # 你的专属 Bark 推送地址
+      - BARK_URL=https://api.day.app/YOUR_BARK_KEY
+      # (可选) 填入你部署这台机器的局域网/公网 IP，让推送能带上抓拍图片
+      - FRIGATE_URL=http://192.168.1.100:5000
