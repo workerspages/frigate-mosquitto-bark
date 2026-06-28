@@ -50,7 +50,7 @@ jobs:
         with:
           # 同时定义 Docker Hub 和 GHCR 的镜像全名
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/frigate-mosquitto-bark
+            ${{ secrets.DOCKERHUB_USERNAME }}/frigate-mqtt-bark
             ghcr.io/${{ github.repository }}
           # 标签规则：如果是 main 分支则标记为 latest，如果是 tag 推送则标记为版本号
           tags: |
