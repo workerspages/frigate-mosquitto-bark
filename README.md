@@ -43,7 +43,7 @@ services:
     privileged: true
     restart: unless-stopped
     stop_grace_period: 30s                  # 为各服务提供足够的关闭时间
-    image: ghcr.io/workerspages/frigate-mosquitto-bark:latest
+    image: ghcr.io/workerspages/frigate-mqtt-bark:latest
     shm_size: "128mb"                      # 分配共享内存，跑一两个摄像头 128M 足够了
     volumes:
       - /etc/localtime:/etc/localtime:ro   # 同步宿主机时间
