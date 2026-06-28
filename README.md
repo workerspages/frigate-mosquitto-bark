@@ -44,25 +44,32 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s                  # 为各服务提供足够的关闭时间
     image: ghcr.io/workerspages/frigate-mqtt-bark:latest
-    shm_size: "128mb"                      # 分配共享内存，跑一两个摄像头 128M 足够了
+    shm_size: "128mb"                       # 分配共享内存，跑一两个摄像头 128M 足够了
     volumes:
-      - /etc/localtime:/etc/localtime:ro   # 同步宿主机时间
-      - ./config:/config                   # 映射刚刚写的配置文件
-      - ./frigate:/media/frigate           # 映射录像和抓拍的保存路径
-      - type: tmpfs                        # 使用内存盘做缓存，拯救硬盘 I/O
+      - /etc/localtime:/etc/localtime:ro    # 同步宿主机时间
+      - ./config:/config                    # 映射刚刚写的配置文件
+      - ./frigate:/media/frigate            # 映射录像和抓拍的保存路径
+      - type: tmpfs                         # 使用内存盘做缓存，拯救硬盘 I/O
         target: /tmp/cache
         tmpfs:
           size: 1000000000                  # 分配 1G 内存给实时缓存
     ports:
-      - "8971:8971"         # Frigate Web 管理界面端口
+      - "8971:8971"         # Frigate Web 管理界面端口 (建议通过内网或 Cloudflare Tunnels 访问)
       - "8554:8554"         # RTSP 转发端口 (可选)
       - "8555:8555/tcp"     # WebRTC 视频流端口 (可选，低延迟看直播用)
       - "8555:8555/udp"     # WebRTC 视频流端口 (可选)
-      # - "5000:5000"       # 暴露 5000 这个“免密验证”端口，让 Bark App 能顺利把图片拉取下来 (不将任何端口暴露到公网)
+      
+      # 遵守安全规范，继续保持 5000 端口关闭，不将免密图片接口暴露到外网
+      # - "5000:5000"       
     environment:
       - TZ=Asia/Shanghai                                 # 设置为中国+8时区
-      - BARK_URL=https://api.day.app/YOUR_BARK_KEY       # 【必填】你的专属 Bark 推送地址和 Key 
-      # - FRIGATE_URL=http://192.168.31.100:5000         # 【可选】填入你机器的局域网或公网 IP 地址，让推送能带上抓拍图片
+      - BARK_URL=https://api.day.app/YOUR_BARK_KEY       # 【必填】你的专属 Bark 推送地址和 Key
+      
+      # 【安全点击跳转优化】
+      # 填入你通过 Cloudflare Tunnels 映射到 8971 的安全公网域名。
+      # 点击 Bark 推送通知后，手机会自动打开此链接，方便你直接安全登录并查看录像！
+      - FRIGATE_URL=https://frigate.你的域名.com         
+      
       # - FRIGATE_RTSP_PASSWORD=password                 # rtsp的密码，请修改为你期望的密码
 ```
 
